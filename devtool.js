@@ -88,9 +88,10 @@ class DevTool extends React.PureComponent {
   };
 
   componentDidMount() {
-    console.warn('react-kilt: Dev Tool inited');
-
     const { observer, keyCode } = this.props;
+
+    // eslint-disable-next-line
+    console.log(`react-wit: Dev Tool inited, use ctrl + ${keyCode} open devTools`);
 
     const oldOnKeyPress = document.onkeypress;
 
@@ -226,7 +227,7 @@ class DevTool extends React.PureComponent {
                   borderTopLeftRadius: '6px',
                 }}
               >
-                Kilt Dev Tool
+                Wit Dev Tool
                 <span
                   style={{
                     fontSize: '11px',

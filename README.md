@@ -1,6 +1,6 @@
 # 优雅的, 高性能的, 定向的状态管理
 
-> 为此, 为她选了一个优雅的名字: kilt
+> 为此, 为她选了一个优雅的名字: wit
 
 
 ## 克隆 & 使用
@@ -17,13 +17,13 @@ cd your-project/components
 clone-by-ymzuiku(){
   git clone --depth=1 https://github.com/ymzuiku/$1.git && rm -rf $1/.git $1/.gitignore
 }
-clone-by-ymzuiku react-kilt
+clone-by-ymzuiku react-wit
 ```
 
 直接引用
 
 ```js
-import createKilt from "components/react-kilt";
+import createWit from "components/react-wit";
 ```
 
 ## 注册例子:
@@ -32,38 +32,42 @@ import createKilt from "components/react-kilt";
 
 ```js
 const actions = {
-  dog: (update, value) => {
+  dog: (value, update) => {
     // 更新dog属性
     update(value + 1);
   },
-  cat: (update, value, values, kiltUpdate) => {
+  cat: (value, update, witUpdate) => {
     // 横向修改其他属性
-    kiltUpdate.dog(500);
+    witUpdate.dog(500);
     update(value + 2);
+  },
+  fish: (value, update, witUpdate, values) => {
+    // 读取其他属性
+    update(values.cat + 2);
   },
 };
 ```
 
 ```js
-import createKilt from 'react-kilt'
+import createwit from 'react-wit'
 
 const isDev = process.env.NODE_ENV === 'development';
 // 依次传入: actions, defaultValues, 打开开发模式的热键(此例子是 ctrl+a)
-const [kilt, controller] = createKilt(actions, {}, isDev && 'KeyA');
+const wit = createWit(actions, {}, isDev && 'KeyA');
 
-export default kilt
+export default wit
 ```
 
 ## 使用
 
 ```js
-import kilt from '../kilt'
+import wit from '../wit'
 
-export default kilt('dog', 'cat')({dog, kiltUpdate})=>{
+export default wit('dog', 'cat')({dog, updateWit})=>{
   return (
     <div>
       <div>{dog}</div>
-      <button onClick={()=> kiltUpdate.dog(50)} >更新全局状态</button>
+      <button onClick={()=> updateWit.dog(50)} >更新全局状态</button>
     </div>
   )
 }
