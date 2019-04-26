@@ -2,6 +2,7 @@
 
 > 为此, 为她选了一个优雅的名字: kilt
 
+
 ## 克隆 & 使用
 
 懒得编译发布了, 进入项目
@@ -22,7 +23,7 @@ clone-by-ymzuiku react-kilt
 直接引用
 
 ```js
-import createKilt from 'components/react-kilt';
+import createKilt from "components/react-kilt";
 ```
 
 ## 注册例子:
@@ -35,22 +36,22 @@ const actions = {
     // 更新dog属性
     update(value + 1);
   },
-  cat: (update, value, values, kiltPush) => {
+  cat: (update, value, values, kiltUpdate) => {
     // 横向修改其他属性
-    kiltPush.dog(500);
+    kiltUpdate.dog(500);
     update(value + 2);
   },
 };
 ```
 
 ```js
-import createKilt from 'react-kilt';
+import createKilt from 'react-kilt'
 
 const isDev = process.env.NODE_ENV === 'development';
 // 依次传入: actions, defaultValues, 打开开发模式的热键(此例子是 ctrl+a)
 const [kilt, controller] = createKilt(actions, {}, isDev && 'KeyA');
 
-export default kilt;
+export default kilt
 ```
 
 ## 使用
@@ -58,12 +59,12 @@ export default kilt;
 ```js
 import kilt from '../kilt'
 
-export default kilt('dog', 'cat')({dog, kiltPush})=>{
+export default kilt('dog', 'cat')({dog, kiltUpdate})=>{
   return (
     <div>
       <div>{dog}</div>
-      <button onClick={()=> kiltPush.dog(50)} >更新全局状态</button>
+      <button onClick={()=> kiltUpdate.dog(50)} >更新全局状态</button>
     </div>
   )
 }
-```
+```js

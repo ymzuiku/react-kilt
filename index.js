@@ -14,7 +14,7 @@ const Kilt = (actions, defalutValues, devKeyCode) => {
     devtool(observer, devKeyCode);
   }
 
-  const controller = { values: observer.values, kiltPush: observer.triggers };
+  const controller = { values: observer.values, kiltUpdate: observer.triggers };
 
   return [
     (...keys) => {
@@ -52,7 +52,7 @@ const Kilt = (actions, defalutValues, devKeyCode) => {
           render() {
             const { forwardedRef, ...rest } = this.props;
 
-            return <Target {...rest} {...this.state} ref={forwardedRef} kiltPush={observer.triggers} />;
+            return <Target {...rest} {...this.state} ref={forwardedRef} kiltUpdate={observer.triggers} />;
           }
         }
 
