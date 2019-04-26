@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import shakePhone from './shakePhone';
+// import shakePhone from './shakePhone';
 
 // eslint-disable-next-line
 class Item extends React.PureComponent {
@@ -42,7 +42,11 @@ class Item extends React.PureComponent {
           lineHeight: '40px',
           borderBottom: '1px solid rgba(0,0,0,0.3)',
           // eslint-disable-next-line
-          backgroundColor: hover ? 'rgba(255,255,255,0.03)' : selected ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0)',
+          backgroundColor: hover
+            ? 'rgba(255,255,255,0.03)'
+            : selected
+            ? 'rgba(255,255,255,0.04)'
+            : 'rgba(255,255,255,0)',
         }}
       >
         <span
@@ -76,10 +80,11 @@ class DevTool extends React.PureComponent {
     isShow: false,
     reload: 0,
     selectedIndex: 0,
+    buttonHover: false,
   };
 
   static defaultProps = {
-    keyCode: 'KeyJ',
+    keyCode: 'KeyS',
   };
 
   componentDidMount() {
@@ -97,7 +102,8 @@ class DevTool extends React.PureComponent {
       }
     };
 
-    shakePhone(this.changeShow);
+    // 先不使用摇一摇
+    // shakePhone(this.changeShow);
 
     observer.devHook = () => {
       if (this.state.isShow) {
@@ -124,9 +130,31 @@ class DevTool extends React.PureComponent {
     });
   };
 
+  handleOnButtonMouseEnter = () => {
+    this.setState({
+      buttonHover: true,
+    });
+  };
+
+  handleOnButtonMouseLeave = () => {
+    this.setState({
+      buttonHover: false,
+    });
+  };
+
+  handleRollBack = () => {
+    const { observer } = this.props;
+    const { selectedIndex } = this.state;
+    const data = observer.devHistory[selectedIndex] || {};
+
+    if (observer.triggers[data.name]) {
+      observer.triggers[data.name](data.lastValue);
+    }
+  };
+
   render() {
     const { observer } = this.props;
-    const { isShow, selectedIndex, reload } = this.state;
+    const { isShow, selectedIndex, reload, buttonHover } = this.state;
 
     const data = observer.devHistory[selectedIndex] || {};
     let num = 0;
@@ -218,7 +246,16 @@ class DevTool extends React.PureComponent {
                 );
               })}
             </div>
-            <div style={{ flex: 3.2, position: 'relative' }}>
+            <div
+              style={{
+                flex: 3.2,
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                // justifyContent: 'center',
+              }}
+            >
               <div
                 style={{
                   position: 'sticky',
@@ -231,6 +268,7 @@ class DevTool extends React.PureComponent {
                   fontFamily: '',
                   fontSize: '11px',
                   borderTopRightRadius: '6px',
+                  width: '100%',
                 }}
               >
                 {data.name} : {num}/{len}
@@ -240,6 +278,7 @@ class DevTool extends React.PureComponent {
                   padding: '20px',
                   backgroundColor: 'rgba(0,0,0,0.12)',
                   borderBottom: '1px solid rgba(0,0,0,0.2)',
+                  width: '100%',
                 }}
               >
                 <p
@@ -254,6 +293,7 @@ class DevTool extends React.PureComponent {
                   padding: '20px',
                   backgroundColor: 'rgba(0,0,0,0.12)',
                   borderBottom: '1px solid rgba(0,0,0,0.2)',
+                  width: '100%',
                 }}
               >
                 <p
@@ -263,6 +303,26 @@ class DevTool extends React.PureComponent {
                 </p>
                 <p>{JSON.stringify(data.value, null, 2)}</p>
               </div>
+
+              <button
+                onClick={this.handleRollBack}
+                onTouchEnd={this.handleRollBack}
+                onMouseEnter={this.handleOnButtonMouseEnter}
+                onMouseLeave={this.handleOnButtonMouseLeave}
+                type="button"
+                style={{
+                  border: '1px solid rgba(0,0,0,0.3)',
+                  outline: 'none',
+                  color: 'rgba(255,255,255,0.8)',
+                  padding: '12px 16px',
+                  margin: '20px auto',
+                  borderRadius: '40px',
+                  backgroundColor: buttonHover ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.05)',
+                  fontSize: '13px',
+                }}
+              >
+                Rollback before value
+              </button>
             </div>
           </div>
         </div>

@@ -2,8 +2,13 @@ import React from 'react';
 import createObserver from './createObserver';
 import devtool from './devtool';
 
-const Kilt = (actions, devKeyCode) => {
+const Kilt = (actions, defalutValues, devKeyCode) => {
+  if (typeof window === 'undefined') {
+    devKeyCode = void 0;
+  }
   const observer = createObserver(devKeyCode);
+
+  observer.values = { ...defalutValues };
 
   if (devKeyCode) {
     devtool(observer, devKeyCode);

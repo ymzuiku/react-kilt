@@ -43,9 +43,13 @@ const actions = {
   },
 };
 
+const defalutValues = {
+  dog: 20,
+}
+
 const isDev = process.env.NODE_ENV === 'development';
 // KeyA 表示使用 ctrl+a 激活 devTool 面板
-const [kilt, controller] = createKilt(actions, isDev && 'KeyA');
+const [kilt, controller] = createKilt(actions, defalutValues, isDev && 'KeyA');
 
 export default kilt
 ```
