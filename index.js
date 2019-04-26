@@ -40,8 +40,8 @@ const Kilt = (actions, defalutValues, devKeyCode) => {
                     });
                   },
                   v,
-                  observer.values,
                   observer.triggers,
+                  observer.values,
                 );
               });
             });
