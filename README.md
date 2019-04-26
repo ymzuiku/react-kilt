@@ -1,7 +1,6 @@
-# 优雅的, 高性能的, 定向的状态管理
+# 一个性感的, 高性能的, 定向的状态管理
 
 > 为此, 为她选了一个优雅的名字: wit
-
 
 ## 克隆 & 使用
 
@@ -23,7 +22,7 @@ clone-by-ymzuiku react-wit
 直接引用
 
 ```js
-import createWit from "components/react-wit";
+import createWit from 'components/react-wit';
 ```
 
 ## 注册例子:
@@ -49,13 +48,13 @@ const actions = {
 ```
 
 ```js
-import createwit from 'react-wit'
+import createwit from 'react-wit';
 
 const isDev = process.env.NODE_ENV === 'development';
 // 依次传入: actions, defaultValues, 打开开发模式的热键(此例子是 ctrl+a)
 const wit = createWit(actions, {}, isDev && 'KeyA');
 
-export default wit
+export default wit;
 ```
 
 ## 使用
@@ -71,4 +70,4 @@ export default wit('dog', 'cat')({dog, updateWit})=>{
     </div>
   )
 }
-```js
+```
