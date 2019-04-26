@@ -84,7 +84,7 @@ class DevTool extends React.PureComponent {
   };
 
   static defaultProps = {
-    keyCode: 'KeyS',
+    keyCode: 'KeyD',
   };
 
   componentDidMount() {
