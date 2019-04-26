@@ -23,10 +23,10 @@ class Item extends React.PureComponent {
   render() {
     const { id, time, name, selected, onClick, observer } = this.props;
     const { hover } = this.state;
-    let num = 0;
+    let num = 1;
 
     if (id) {
-      num = observer.devEventNumber[name][id];
+      num = observer.devEventNumber[name][id] || 1;
     }
 
     return (
@@ -88,6 +88,8 @@ class DevTool extends React.PureComponent {
   };
 
   componentDidMount() {
+    console.warn('react-kilt: Dev Tool inited');
+
     const { observer, keyCode } = this.props;
 
     const oldOnKeyPress = document.onkeypress;

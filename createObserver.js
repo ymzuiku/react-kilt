@@ -25,12 +25,8 @@ function createObserver(isDev) {
               observer.devEventNumber[key] = {};
             }
 
-            let num = 0;
+            const num = Object.keys(observer.devEventNumber[key]).length;
 
-            // eslint-disable-next-line
-            for (const unused in observer.devEventNumber[key]) {
-              num += 1;
-            }
             observer.devEventNumber[key]['len'] = num;
             observer.devEventNumber[key][id] = num;
 
