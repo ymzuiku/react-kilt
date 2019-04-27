@@ -55,7 +55,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
         render() {
           const { forwardedRef, ...rest } = this.props;
 
-          return <Target {...rest} {...this.state} ref={forwardedRef} witUpdatess={observer.triggers} />;
+          return <Target {...rest} {...this.state} ref={forwardedRef} witUpdates={observer.triggers} />;
         }
       }
 
