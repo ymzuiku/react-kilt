@@ -39,8 +39,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
                     });
                   }
                 },
-                observer.triggers,
-                observer.values,
+                { values: observer.values, witUpdates: observer.triggers },
               );
             });
           });

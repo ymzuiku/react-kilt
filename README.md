@@ -31,18 +31,18 @@ import createWit from 'components/react-wit';
 
 ```js
 const actions = {
-  dog: (value, update) => {
+  dog: (payload, update) => {
     // 更新dog属性
-    update(value + 1);
+    update(payload + 1);
   },
-  cat: (value, update, witUpdate) => {
+  cat: (payload, update, { witUpdate }) => {
     // 横向修改其他属性
     witUpdate.dog(500);
-    update(value + 2);
+    update(payload + 2);
   },
-  fish: (value, update, witUpdate, values) => {
+  fish: (payload, update, { values }) => {
     // 读取其他属性
-    update(values.cat + 2);
+    update(payload + values.cat);
   },
 };
 ```
