@@ -62,11 +62,11 @@ export default wit;
 ```js
 import wit from '../wit'
 
-export default wit('dog', 'cat')({dog, updateWit})=>{
+export default wit('dog', 'cat')({dog, witUpdates})=>{
   return (
     <div>
       <div>{dog}</div>
-      <button onClick={()=> updateWit.dog(50)} >更新全局状态</button>
+      <button onClick={()=> witUpdates.dog(50)} >更新全局状态</button>
     </div>
   )
 }
