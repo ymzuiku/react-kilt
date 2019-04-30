@@ -2,11 +2,11 @@ function createObserver(isDev) {
   const observer = {
     values: Object.create(null),
     valuesMap: Object.create(null),
+    rollbackIds: [],
     fns: Object.create(null),
     subKeys: Object.create(null),
     triggers: Object.create(null),
     devHistory: [],
-    devEventNumber: Object.create(null),
     devHook: void 0,
     subscribe: (key, fn) => {
       if (typeof fn !== 'function') {
@@ -36,9 +36,13 @@ function createObserver(isDev) {
     },
     setValues: (key, value, isSaveHistort) => {
       let id;
+      // 获取回滚到上一次的id
+      const lastId = observer.rollbackIds[observer.rollbackIds.length - 1];
 
       // 更新values
-      observer.values[key] = value;
+      if (key !== '__rollback__') {
+        observer.values[key] = value;
+      }
 
       // 记录历史values
       if (isSaveHistort || isDev) {
@@ -56,39 +60,39 @@ function createObserver(isDev) {
         const now = new Date();
         const time = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
 
-        if (observer.devEventNumber[key] === void 0) {
-          observer.devEventNumber[key] = {};
-        }
-
         const num = observer.devHistory.length;
 
-        observer.devEventNumber[key]['len'] = num;
-        observer.devEventNumber[key][id] = num;
+        // 从数组开头插入
+        observer.devHistory = [
+          {
+            num,
+            id,
+            time,
+            name: key,
+            value: key === '__rollback__' ? void 0 : value,
+            values: { ...observer.values },
+            lastValue: key === '__rollback__' ? void 0 : observer.valuesMap[lastId] && observer.valuesMap[lastId][key],
+            lastValues: key === '__rollback__' ? void 0 : observer.valuesMap[lastId],
+          },
+        ].concat(observer.devHistory);
 
-        observer.devHistory.push({
-          num,
-          id,
-          time,
-          name: key,
-          value,
-          values: { ...observer.values },
-          lastValue: observer.valuesMap[id][key],
-          lastValues: observer.valuesMap[id],
-        });
         if (observer.devHook) {
           observer.devHook(key);
         }
       }
 
-      return id;
+      observer.rollbackIds.push(id);
+      return lastId;
     },
-    rollbackOfId: id => {
+    rollback: id => {
       if (!id || !observer.valuesMap[id]) {
         // eslint-disable-next-line
         console.warn('react-wit: rollbackOfId is error');
         return;
       }
       const oldValue = observer.valuesMap[id];
+
+      observer.setValues('__rollback__', oldValue);
 
       for (const k in observer.values) {
         observer.values[k] = oldValue[k];
@@ -105,7 +109,7 @@ function createObserver(isDev) {
 
   observer.subscribe(key, v => {
     if (v === key) {
-      observer.setValues(key, void 0);
+      observer.setValues(key, void 0, true);
     }
   });
   observer.triggers[key](key);

@@ -45,16 +45,18 @@ const createWit = (actions, defalutValues, devKeyCode) => {
               }
               actions[k](
                 v,
-                nextValue => {
-                  observer.setValues(k, nextValue);
+                (nextValue, isSaveHistort) => {
+                  const id = observer.setValues(k, nextValue, isSaveHistort);
 
                   if (!this.unmount) {
                     this.setState({
                       [k]: nextValue,
                     });
                   }
+
+                  return id;
                 },
-                { witValues: observer.values, witUpdates: observer.triggers },
+                { witValues: observer.values, witUpdates: observer.triggers, witRollback: observer.rollback },
               );
             });
           });
@@ -81,6 +83,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
               ref={forwardedRef}
               witValues={observer.values}
               witUpdates={observer.triggers}
+              witRollback={observer.rollback}
             />
           );
         }
@@ -94,6 +97,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
 
   wit.witValues = observer.values;
   wit.witUpdates = observer.triggers;
+  wit.witRollback = observer.rollback;
 
   return wit;
 };

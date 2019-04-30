@@ -71,3 +71,21 @@ export default wit('dog', 'cat')({dog, witUpdates})=>{
   )
 }
 ```
+
+## 时间回滚
+
+每次update都可以设置是否记录上次数据, 从而进行回滚
+
+```js
+const actions = {
+  dog: (payload, update, { witRollback }) => {
+    // 更新dog属性, 并且记录更新之前的ID
+    const timeId = update(payload + 1, true);
+
+    // 根据条件, 可以将**整个项目**回滚到更新之前
+    if ('xxx') {
+      witRollback(timeId)
+    }
+  },
+};
+```

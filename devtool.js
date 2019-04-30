@@ -62,7 +62,7 @@ class Item extends React.PureComponent {
         >
           {time}
         </span>
-        <span>{name}</span>
+        <span style={{ userSelect: 'text', fontSize: '13px' }}>{name}</span>
       </div>
     );
   }
@@ -151,7 +151,17 @@ class DevTool extends React.PureComponent {
     const { selectedIndex } = this.state;
     const data = observer.devHistory[selectedIndex] || {};
 
-    observer.rollbackOfId(data.id);
+    observer.rollback(data.id);
+    this.setState({
+      selectedIndex: observer.devHistory.length - 1,
+    });
+  };
+
+  // 阻止事件冒泡
+  handleStopPropagation = e => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
   };
 
   render() {
@@ -182,6 +192,7 @@ class DevTool extends React.PureComponent {
             padding: '20px',
             overflow: 'hidden',
           }}
+          onClick={this.changeShow}
         >
           <div
             style={{
@@ -193,6 +204,7 @@ class DevTool extends React.PureComponent {
               color: '#f2f2f2',
               transform: isShow ? 'translateX(0px)' : 'translateX(100vw)',
             }}
+            onClick={this.handleStopPropagation}
           >
             <div
               style={{
@@ -241,6 +253,7 @@ class DevTool extends React.PureComponent {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                overflow: 'auto',
                 // justifyContent: 'center',
               }}
             >
@@ -249,6 +262,8 @@ class DevTool extends React.PureComponent {
                   display: 'flex',
                   flexDirection: 'row',
                   position: 'sticky',
+                  top: '0px',
+                  left: '0px',
                   cursor: 'pointer',
                   paddingLeft: '10px',
                   height: '40px',
@@ -259,9 +274,10 @@ class DevTool extends React.PureComponent {
                   fontSize: '11px',
                   borderTopRightRadius: '6px',
                   width: '100%',
+                  backgroundColor: '#333335',
                 }}
               >
-                <div>{data.name}</div>
+                <div style={{ userSelect: 'text' }}>{data.name}</div>
                 <div style={{ flex: 1 }} />
                 <button
                   onClick={this.handleRollBack}
@@ -287,35 +303,56 @@ class DevTool extends React.PureComponent {
                 style={{
                   padding: '20px',
                   backgroundColor: 'rgba(0,0,0,0.12)',
-                  borderBottom: '1px solid rgba(0,0,0,0.2)',
+                  // borderBottom: '1px solid rgba(0,0,0,0.2)',
                   width: '100%',
                 }}
               >
                 <p
-                  style={{ fontSize: '11px', marginBottom: '8px', marginRight: '8px', color: 'rgba(255,255,255, 0.5)' }}
+                  style={{
+                    userSelect: 'text',
+                    fontSize: '11px',
+                    marginBottom: '8px',
+                    marginRight: '8px',
+                    color: 'rgba(255,255,255, 0.5)',
+                  }}
                 >
-                  Before value:
+                  Before {data.name} value:
                 </p>
-                <p>{JSON.stringify(data.lastValue, null, 2)}</p>
+                <pre>
+                  <code style={{ fontSize: '13px', whiteSpace: 'pre-wrap', userSelect: 'text' }}>
+                    {JSON.stringify(data.lastValue, null, 2)}
+                  </code>
+                </pre>
               </div>
               <div
                 style={{
-                  padding: '20px',
+                  padding: '0px 20px 20px',
                   backgroundColor: 'rgba(0,0,0,0.12)',
                   borderBottom: '1px solid rgba(0,0,0,0.2)',
                   width: '100%',
                 }}
               >
                 <p
-                  style={{ fontSize: '11px', marginBottom: '8px', marginRight: '8px', color: 'rgba(255,255,255, 0.5)' }}
+                  style={{
+                    userSelect: 'text',
+                    fontSize: '11px',
+                    marginBottom: '8px',
+                    marginRight: '8px',
+                    color: 'rgba(255,255,255, 0.5)',
+                  }}
                 >
-                  After value:
+                  The action {data.name} value:
                 </p>
-                <p>{JSON.stringify(data.value, null, 2)}</p>
+                <pre>
+                  <code style={{ fontSize: '13px', whiteSpace: 'pre-wrap', userSelect: 'text' }}>
+                    {JSON.stringify(data.value, null, 2)}
+                  </code>
+                </pre>
               </div>
 
               <div
                 style={{
+                  marginTop: '1px',
                   padding: '20px',
                   backgroundColor: 'rgba(0,0,0,0.12)',
                   borderBottom: '1px solid rgba(0,0,0,0.2)',
@@ -323,11 +360,21 @@ class DevTool extends React.PureComponent {
                 }}
               >
                 <p
-                  style={{ fontSize: '11px', marginBottom: '8px', marginRight: '8px', color: 'rgba(255,255,255, 0.5)' }}
+                  style={{
+                    userSelect: 'text',
+                    fontSize: '11px',
+                    marginBottom: '8px',
+                    marginRight: '8px',
+                    color: 'rgba(255,255,255, 0.5)',
+                  }}
                 >
-                  End values:
+                  End all values:
                 </p>
-                <p>{JSON.stringify(data.values, null, 2)}</p>
+                <pre>
+                  <code style={{ fontSize: '13px', whiteSpace: 'pre-wrap', userSelect: 'text' }}>
+                    {JSON.stringify(data.values, null, 2)}
+                  </code>
+                </pre>
               </div>
             </div>
           </div>
