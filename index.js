@@ -19,14 +19,16 @@ const createWit = (actions, defalutValues, devKeyCode) => {
       class Result extends React.PureComponent {
         unmount = false;
 
+        obs = Object.create(null);
+
         constructor(props) {
           super(props);
 
           const state = {};
 
           keys.forEach(k => {
-            state[k] = void 0;
-            observer.subscribe(k, v => {
+            state[k] = observer.values[k];
+            this.obs[k] = observer.subscribe(k, v => {
               if (typeof actions[k] !== 'function') {
                 throw new Error(`错误: wit 的 actions 中未包含 ${k} 属性`);
               }
@@ -39,7 +41,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
                     });
                   }
                 },
-                { values: observer.values, witUpdates: observer.triggers },
+                { witValues: observer.values, witUpdates: observer.triggers },
               );
             });
           });
@@ -49,12 +51,25 @@ const createWit = (actions, defalutValues, devKeyCode) => {
 
         componentWillUnmount() {
           this.unmount = true;
+          for (const k in this.obs) {
+            if (typeof this.obs[k] === 'function') {
+              this.obs[k]();
+            }
+          }
         }
 
         render() {
           const { forwardedRef, ...rest } = this.props;
 
-          return <Target {...rest} {...this.state} ref={forwardedRef} witUpdates={observer.triggers} />;
+          return (
+            <Target
+              {...rest}
+              {...this.state}
+              ref={forwardedRef}
+              witValues={observer.values}
+              witUpdates={observer.triggers}
+            />
+          );
         }
       }
 
@@ -64,7 +79,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
     };
   };
 
-  wit.values = observer.values;
+  wit.witValues = observer.values;
   wit.witUpdates = observer.triggers;
 
   return wit;

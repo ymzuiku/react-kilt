@@ -40,9 +40,9 @@ const actions = {
     witUpdate.dog(500);
     update(payload + 2);
   },
-  fish: (payload, update, { values }) => {
+  fish: (payload, update, { witValues }) => {
     // 读取其他属性
-    update(payload + values.cat);
+    update(payload + witValues.cat);
   },
 };
 ```
