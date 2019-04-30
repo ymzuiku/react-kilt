@@ -21,13 +21,8 @@ class Item extends React.PureComponent {
   };
 
   render() {
-    const { id, time, name, selected, onClick, observer } = this.props;
+    const { num, time, name, selected, onClick } = this.props;
     const { hover } = this.state;
-    let num = 1;
-
-    if (id) {
-      num = observer.devEventNumber[name][id] || 1;
-    }
 
     return (
       <div
@@ -53,22 +48,21 @@ class Item extends React.PureComponent {
           style={{
             fontSize: '11px',
             marginRight: '8px',
+            color: 'rgba(255,255,255, 0.3)',
+          }}
+        >
+          {num + 1}
+        </span>
+        <span
+          style={{
+            fontSize: '11px',
+            marginRight: '8px',
             color: 'rgba(255,255,255, 0.5)',
           }}
         >
           {time}
         </span>
         <span>{name}</span>
-        <span
-          style={{
-            fontSize: '11px',
-            marginLeft: '8px',
-            color: 'rgba(255,255,255, 0.3)',
-          }}
-        >
-          {"'"}
-          {num}
-        </span>
       </div>
     );
   }
@@ -76,22 +70,29 @@ class Item extends React.PureComponent {
 
 // eslint-disable-next-line
 class DevTool extends React.PureComponent {
-  state = {
-    isShow: false,
-    reload: 0,
-    selectedIndex: 0,
-    buttonHover: false,
-  };
-
   static defaultProps = {
     keyCode: 'KeyD',
   };
 
-  componentDidMount() {
-    const { observer, keyCode } = this.props;
+  constructor(props) {
+    super(props);
 
     // eslint-disable-next-line
-    console.log(`react-wit: Dev Tool inited, use ctrl + ${keyCode} open devTools`);
+    console.log(
+      `%creact-wit: In develop-mode, use [ Ctrl + ${this.props.keyCode.replace('Key', '')} ] open the DevTools`,
+      `padding: 1px 2px; background: rgb(70, 70, 70); color: rgb(240, 235, 200); width:100%;`,
+    );
+
+    this.state = {
+      isShow: false,
+      reload: 0,
+      selectedIndex: 0,
+      buttonHover: false,
+    };
+  }
+
+  componentDidMount() {
+    const { observer, keyCode } = this.props;
 
     const oldOnKeyPress = document.onkeypress;
 
@@ -150,23 +151,14 @@ class DevTool extends React.PureComponent {
     const { selectedIndex } = this.state;
     const data = observer.devHistory[selectedIndex] || {};
 
-    if (observer.triggers[data.name]) {
-      observer.triggers[data.name](data.lastValue);
-    }
+    observer.rollbackOfId(data.id);
   };
 
   render() {
     const { observer } = this.props;
-    const { isShow, selectedIndex, reload, buttonHover } = this.state;
+    const { isShow, selectedIndex, buttonHover } = this.state;
 
     const data = observer.devHistory[selectedIndex] || {};
-    let num = 0;
-    let len = 0;
-
-    if (data.id) {
-      num = observer.devEventNumber[data.name][data.id];
-      len = observer.devEventNumber[data.name]['len'];
-    }
 
     return (
       <div
@@ -228,18 +220,11 @@ class DevTool extends React.PureComponent {
                 }}
               >
                 Wit Dev Tool
-                <span
-                  style={{
-                    fontSize: '11px',
-                    marginLeft: '8px',
-                  }}
-                >
-                  actions: {reload}
-                </span>
               </div>
               {observer.devHistory.map((v, i) => {
                 return (
                   <Item
+                    num={i}
                     observer={observer}
                     selected={i === selectedIndex}
                     key={v.id}
@@ -261,6 +246,8 @@ class DevTool extends React.PureComponent {
             >
               <div
                 style={{
+                  display: 'flex',
+                  flexDirection: 'row',
                   position: 'sticky',
                   cursor: 'pointer',
                   paddingLeft: '10px',
@@ -274,7 +261,27 @@ class DevTool extends React.PureComponent {
                   width: '100%',
                 }}
               >
-                {data.name} : {num}/{len}
+                <div>{data.name}</div>
+                <div style={{ flex: 1 }} />
+                <button
+                  onClick={this.handleRollBack}
+                  onTouchEnd={this.handleRollBack}
+                  onMouseEnter={this.handleOnButtonMouseEnter}
+                  onMouseLeave={this.handleOnButtonMouseLeave}
+                  type="button"
+                  style={{
+                    borderLeft: '1px solid rgba(0,0,0,0.3)',
+                    outline: 'none',
+                    color: 'rgba(255,255,255,0.8)',
+                    padding: '2px 10px 2px 10px',
+                    // margin: '0px 4px',
+                    // borderRadius: '40px',
+                    backgroundColor: buttonHover ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.05)',
+                    fontSize: '11px',
+                  }}
+                >
+                  Rollback to here
+                </button>
               </div>
               <div
                 style={{
@@ -307,25 +314,21 @@ class DevTool extends React.PureComponent {
                 <p>{JSON.stringify(data.value, null, 2)}</p>
               </div>
 
-              <button
-                onClick={this.handleRollBack}
-                onTouchEnd={this.handleRollBack}
-                onMouseEnter={this.handleOnButtonMouseEnter}
-                onMouseLeave={this.handleOnButtonMouseLeave}
-                type="button"
+              <div
                 style={{
-                  border: '1px solid rgba(0,0,0,0.3)',
-                  outline: 'none',
-                  color: 'rgba(255,255,255,0.8)',
-                  padding: '12px 16px',
-                  margin: '20px auto',
-                  borderRadius: '40px',
-                  backgroundColor: buttonHover ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.05)',
-                  fontSize: '13px',
+                  padding: '20px',
+                  backgroundColor: 'rgba(0,0,0,0.12)',
+                  borderBottom: '1px solid rgba(0,0,0,0.2)',
+                  width: '100%',
                 }}
               >
-                Rollback before value
-              </button>
+                <p
+                  style={{ fontSize: '11px', marginBottom: '8px', marginRight: '8px', color: 'rgba(255,255,255, 0.5)' }}
+                >
+                  End values:
+                </p>
+                <p>{JSON.stringify(data.values, null, 2)}</p>
+              </div>
             </div>
           </div>
         </div>

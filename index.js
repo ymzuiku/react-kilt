@@ -29,12 +29,25 @@ const createWit = (actions, defalutValues, devKeyCode) => {
           keys.forEach(k => {
             state[k] = observer.values[k];
             this.obs[k] = observer.subscribe(k, v => {
+              // 时间回滚
+              if (v && v.__rollback__) {
+                if (!this.unmount) {
+                  this.setState({
+                    [k]: v.value,
+                  });
+                }
+                return;
+              }
+
+              // 正常接收数据进行修改
               if (typeof actions[k] !== 'function') {
                 throw new Error(`错误: wit 的 actions 中未包含 ${k} 属性`);
               }
               actions[k](
                 v,
                 nextValue => {
+                  observer.setValues(k, nextValue);
+
                   if (!this.unmount) {
                     this.setState({
                       [k]: nextValue,
