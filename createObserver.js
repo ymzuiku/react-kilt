@@ -15,9 +15,9 @@ function createObserver(isDev) {
       if (!observer.fns[key]) {
         observer.fns[key] = {};
         observer.subKeys[key] = 0;
-        observer.triggers[key] = value => {
+        observer.triggers[key] = (value, id) => {
           for (const k in observer.fns[key]) {
-            observer.fns[key][k](value);
+            observer.fns[key][k](value, id);
           }
         };
       }
@@ -34,7 +34,7 @@ function createObserver(isDev) {
         }
       };
     },
-    setValues: (key, value, isSaveHistort) => {
+    setValues: (key, value, isSaveHistory) => {
       let id;
       // 获取回滚到上一次的id
       const lastId = observer.rollbackIds[observer.rollbackIds.length - 1];
@@ -45,7 +45,7 @@ function createObserver(isDev) {
       }
 
       // 记录历史values
-      if (isSaveHistort || isDev) {
+      if (isSaveHistory || isDev) {
         id = Date.now() + Math.random();
 
         observer.valuesMap[id] = { ...observer.values };
@@ -97,10 +97,7 @@ function createObserver(isDev) {
       for (const k in observer.values) {
         observer.values[k] = oldValue[k];
 
-        observer.triggers[k]({
-          __rollback__: 'true',
-          value: oldValue[k],
-        });
+        observer.triggers[k](oldValue[k]);
       }
     },
   };
@@ -113,6 +110,10 @@ function createObserver(isDev) {
     }
   });
   observer.triggers[key](key);
+
+  if (isDev) {
+    window.witObserver = observer;
+  }
 
   return observer;
 }

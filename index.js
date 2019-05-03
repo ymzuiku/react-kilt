@@ -1,52 +1,67 @@
 import React from 'react';
 import createObserver from './createObserver';
-import devtool from './devtool';
 
 const createWit = (actions, defalutValues, devKeyCode) => {
-  if (typeof window === 'undefined') {
-    devKeyCode = void 0;
-  }
+  // 初始化订阅发布对象
   const observer = createObserver(devKeyCode);
 
   observer.values = { ...defalutValues };
 
-  if (devKeyCode) {
-    devtool(observer, devKeyCode);
+  // 初始化开发工具
+  if (typeof window !== 'undefined' && devKeyCode) {
+    import('./devtool').then(v => {
+      if (v && v.default) {
+        v.default(observer, devKeyCode);
+      }
+    });
   }
 
+  // 创建HOC
   const wit = (...keys) => {
     return Target => {
       class Result extends React.PureComponent {
+        // 用于校验触发事件的是否此组件
+        $$witID = Symbol('witID');
+
+        state = Object.create(null);
+
         unmount = false;
 
-        obs = Object.create(null);
+        removeSubscribes = Object.create(null);
+
+        updates = Object.create(null);
 
         constructor(props) {
           super(props);
 
-          const state = {};
-
+          // 根据 HOC 参数捆绑订阅发布
           keys.forEach(k => {
-            state[k] = observer.values[k];
-            this.obs[k] = observer.subscribe(k, v => {
-              // 时间回滚
-              if (v && v.__rollback__) {
+            this.state[k] = observer.values[k];
+
+            // 捆绑触发函数
+            this.updates[k] = value => {
+              observer.triggers[k](value, this.$$witID);
+            };
+
+            // 创建订阅器
+            this.removeSubscribes[k] = observer.subscribe(k, (v, witID) => {
+              // 如果发布器不是本组件, 仅做更新, 不执行 actions
+              if (witID !== this.$$witID) {
                 if (!this.unmount) {
                   this.setState({
-                    [k]: v.value,
+                    [k]: v,
                   });
                 }
                 return;
               }
 
-              // 正常接收数据进行修改
-              if (typeof actions[k] !== 'function') {
-                throw new Error(`错误: wit 的 actions 中未包含 ${k} 属性`);
-              }
+              // 如果发布器是本组件, 执行action, 并且在action中选择性的更新
+              // 参数为: (value, update, {witValues, witUpdates, witRollback})
               actions[k](
                 v,
-                (nextValue, isSaveHistort) => {
-                  const id = observer.setValues(k, nextValue, isSaveHistort);
+                (nextValue, isSaveHistory) => {
+                  // 更新observer中的值
+                  const id = observer.setValues(k, nextValue, isSaveHistory);
 
                   if (!this.unmount) {
                     this.setState({
@@ -60,15 +75,15 @@ const createWit = (actions, defalutValues, devKeyCode) => {
               );
             });
           });
-
-          this.state = state;
         }
 
         componentWillUnmount() {
+          // 标记组件将要被施放
           this.unmount = true;
-          for (const k in this.obs) {
-            if (typeof this.obs[k] === 'function') {
-              this.obs[k]();
+          // 清空订阅
+          for (const k in this.removeSubscribes) {
+            if (typeof this.removeSubscribes[k] === 'function') {
+              this.removeSubscribes[k]();
             }
           }
         }
@@ -82,13 +97,14 @@ const createWit = (actions, defalutValues, devKeyCode) => {
               {...this.state}
               ref={forwardedRef}
               witValues={observer.values}
-              witUpdates={observer.triggers}
+              witUpdates={this.updates}
               witRollback={observer.rollback}
             />
           );
         }
       }
 
+      // ref, HOC穿透
       return React.forwardRef((props, ref) => {
         return <Result {...props} forwardedRef={ref} />;
       });

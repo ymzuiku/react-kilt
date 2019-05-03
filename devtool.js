@@ -71,7 +71,7 @@ class Item extends React.PureComponent {
 // eslint-disable-next-line
 class DevTool extends React.PureComponent {
   static defaultProps = {
-    keyCode: 'KeyD',
+    keyCode: 'd',
   };
 
   constructor(props) {
@@ -79,7 +79,7 @@ class DevTool extends React.PureComponent {
 
     // eslint-disable-next-line
     console.log(
-      `%creact-wit: In develop-mode, use [ Ctrl + ${this.props.keyCode.replace('Key', '')} ] open the DevTools`,
+      `%creact-wit: In develop-mode, use [ Ctrl + ${this.props.keyCode} ] open the DevTools`,
       `padding: 1px 2px; background: rgb(70, 70, 70); color: rgb(240, 235, 200); width:100%;`,
     );
 
@@ -101,7 +101,7 @@ class DevTool extends React.PureComponent {
       if (oldOnKeyPress) {
         oldOnKeyPress(e);
       }
-      if (e.ctrlKey && e.code === keyCode) {
+      if (e.ctrlKey && e.key === keyCode) {
         this.changeShow();
       }
     };
