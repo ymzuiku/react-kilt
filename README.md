@@ -25,6 +25,13 @@ clone-by-ymzuiku react-wit
 import createWit from 'components/react-wit';
 ```
 
+## 数据流
+
+| Component | - - - - - - | Rerender Component |
+| ^
+v |
+| update | -> | action | -> |nextValue |
+
 ## 注册例子:
 
 编写一些 action
@@ -74,7 +81,7 @@ export default wit('dog', 'cat')({dog, witUpdates})=>{
 
 ## 时间回滚
 
-每次update都可以设置是否记录上次数据, 从而进行回滚
+每次 update 都可以设置是否记录上次数据, 从而进行回滚
 
 ```js
 const actions = {
@@ -84,7 +91,7 @@ const actions = {
 
     // 根据条件, 可以将**整个项目**回滚到更新之前
     if ('xxx') {
-      witRollback(timeId)
+      witRollback(timeId);
     }
   },
 };
