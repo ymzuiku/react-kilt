@@ -27,11 +27,13 @@ import createWit from 'components/react-wit';
 
 ## 数据流
 
+整个数据流非常简短, 由一个 Component 触发 action, 再由 action 更新相关组件
+
 ```
-| Component |  - -  - -  | Rerender Components |
-    |                               ^
-    v                               |
-| update    | -> | action | -> |nextValue|
+| Component | --- | Rerender Components |
+    |                    ^
+    v                    |
+| Action    | ---> | Update |
 ```
 
 ## 注册例子:
