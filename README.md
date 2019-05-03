@@ -28,7 +28,7 @@ import createWit from 'components/react-wit';
 ## 数据流
 
 ```
-| Component |  - -  - -  | Rerender Component |
+| Component |  - -  - -  | Rerender Components |
     |                               ^
     v                               |
 | update    | -> | action | -> |nextValue|
