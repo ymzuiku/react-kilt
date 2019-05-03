@@ -46,9 +46,9 @@ const actions = {
     // 更新dog属性
     update(payload + 1);
   },
-  cat: (payload, update, { witUpdate }) => {
+  cat: (payload, update, { witUpdates }) => {
     // 横向修改其他属性
-    witUpdate.dog(500);
+    witUpdates.dog(500);
     update(payload + 2);
   },
   fish: (payload, update, { witValues }) => {
@@ -58,7 +58,7 @@ const actions = {
 };
 ```
 
-使用 actions 创建 wit 对象(wit 对象是一个 HOC)
+使用 actions 创建 wit 对象(wit对象是一个HOC)
 
 ```js
 import createwit from 'react-wit';
@@ -72,17 +72,17 @@ export default wit;
 
 ## 使用
 
-引入刚刚创建的 wit 对象, 给组件注入 action
+引入刚刚创建的 wit 对象, 给组件注入 action 
 
 ```js
 import wit from '../wit'
 
 //dog 对应 actions.dog
-export default wit('dog', 'cat')({dog, witUpdates})=>{
+export default wit('dog', 'cat')({ dog, witActions })=>{
 
   function updateDog() {
     // 执行 action.dog 函数
-    witUpdates.dog(50)
+    witActions.dog(50)
   }
 
   return (
@@ -96,7 +96,7 @@ export default wit('dog', 'cat')({dog, witUpdates})=>{
 
 ## 时间回滚
 
-每次 update 都可以设置是否记录上次数据, 从而进行回滚
+每次update都可以设置是否记录上次数据, 从而进行回滚
 
 ```js
 const actions = {
@@ -106,7 +106,7 @@ const actions = {
 
     // 根据条件, 可以将**整个项目**回滚到更新之前
     if ('xxx') {
-      witRollback(timeId);
+      witRollback(timeId)
     }
   },
 };

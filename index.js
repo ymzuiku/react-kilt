@@ -29,7 +29,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
 
         removeSubscribes = Object.create(null);
 
-        updates = Object.create(null);
+        actions = Object.create(null);
 
         constructor(props) {
           super(props);
@@ -39,7 +39,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
             this.state[k] = observer.values[k];
 
             // 捆绑触发函数
-            this.updates[k] = value => {
+            this.actions[k] = value => {
               observer.triggers[k](value, this.$$witID);
             };
 
@@ -97,7 +97,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
               {...this.state}
               ref={forwardedRef}
               witValues={observer.values}
-              witUpdates={this.updates}
+              witActions={this.actions}
               witRollback={observer.rollback}
             />
           );
