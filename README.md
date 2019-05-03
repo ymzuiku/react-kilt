@@ -58,6 +58,8 @@ const actions = {
 };
 ```
 
+使用 actions 创建 wit 对象(wit 对象是一个 HOC)
+
 ```js
 import createwit from 'react-wit';
 
@@ -70,14 +72,23 @@ export default wit;
 
 ## 使用
 
+引入刚刚创建的 wit 对象, 给组件注入 action
+
 ```js
 import wit from '../wit'
 
+//dog 对应 actions.dog
 export default wit('dog', 'cat')({dog, witUpdates})=>{
+
+  function updateDog() {
+    // 执行 action.dog 函数
+    witUpdates.dog(50)
+  }
+
   return (
     <div>
       <div>{dog}</div>
-      <button onClick={()=> witUpdates.dog(50)} >更新全局状态</button>
+      <button onClick={updateDog} >更新全局状态</button>
     </div>
   )
 }
