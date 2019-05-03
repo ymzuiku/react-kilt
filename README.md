@@ -27,7 +27,7 @@ import createWit from 'components/react-wit';
 
 ## 数据流
 
-整个数据流非常简短, 由一个 Component 触发 action, 再由 action 更新相关组件
+整个数据流非常简短, 由一个 Component 触发 updates.action, 再由 action 更新和该 action 关联的多个 Components
 
 ```
 | Component | --- | Rerender Components |
