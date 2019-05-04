@@ -7,6 +7,10 @@ const createWit = (actions, defalutValues, devKeyCode) => {
 
   observer.values = { ...defalutValues };
 
+  const dispatch = (key, payload) => {
+    observer.dispatch(actions[key], payload);
+  };
+
   // 初始化开发工具
   if (typeof window !== 'undefined' && devKeyCode) {
     import('./devtool').then(v => {
@@ -29,50 +33,21 @@ const createWit = (actions, defalutValues, devKeyCode) => {
 
         removeSubscribes = Object.create(null);
 
-        actions = Object.create(null);
-
         constructor(props) {
           super(props);
 
-          // 根据 HOC 参数捆绑订阅发布
+          // 只订阅 keys 中的值
           keys.forEach(k => {
             this.state[k] = observer.values[k];
 
-            // 捆绑触发函数
-            this.actions[k] = value => {
-              observer.triggers[k](value, this.$$witID);
-            };
-
             // 创建订阅器
-            this.removeSubscribes[k] = observer.subscribe(k, (v, witID) => {
-              // 如果发布器不是本组件, 仅做更新, 不执行 actions
-              if (witID !== this.$$witID) {
-                if (!this.unmount) {
-                  this.setState({
-                    [k]: v,
-                  });
-                }
-                return;
+            this.removeSubscribes[k] = observer.subscribe(k, v => {
+              // 如果发布器不是本组件, 仅做更新, 不执行
+              if (!this.unmount) {
+                this.setState({
+                  [k]: v,
+                });
               }
-
-              // 如果发布器是本组件, 执行action, 并且在action中选择性的更新
-              // 参数为: (value, update, {witValues, witUpdates, witRollback})
-              actions[k](
-                v,
-                (nextValue, isSaveHistory) => {
-                  // 更新observer中的值
-                  const id = observer.setValues(k, nextValue, isSaveHistory);
-
-                  if (!this.unmount) {
-                    this.setState({
-                      [k]: nextValue,
-                    });
-                  }
-
-                  return id;
-                },
-                { witValues: observer.values, witUpdates: observer.triggers, witRollback: observer.rollback },
-              );
             });
           });
         }
@@ -96,9 +71,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
               {...rest}
               {...this.state}
               ref={forwardedRef}
-              witValues={observer.values}
-              witActions={this.actions}
-              witRollback={observer.rollback}
+              wit={{ values: observer.values, rollback: observer.rollback, dispatch }}
             />
           );
         }
@@ -111,9 +84,10 @@ const createWit = (actions, defalutValues, devKeyCode) => {
     };
   };
 
-  wit.witValues = observer.values;
-  wit.witUpdates = observer.triggers;
-  wit.witRollback = observer.rollback;
+  wit.values = observer.values;
+  wit.update = observer.triggers;
+  wit.rollback = observer.rollback;
+  wit.dispatch = dispatch;
 
   return wit;
 };

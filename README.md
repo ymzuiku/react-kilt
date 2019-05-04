@@ -27,7 +27,7 @@ import createWit from 'components/react-wit';
 
 ## 数据流
 
-整个数据流非常简短, 由一个 Component 触发 updates.action, 再由 action 更新和该 action 关联的多个 Components
+整个数据流非常简短, 由一个 Component 触发 update, 再由 action 更新和该 action 关联的多个 Components
 
 ```
 | Component | --- | Rerender Components |
@@ -42,18 +42,19 @@ import createWit from 'components/react-wit';
 
 ```js
 const actions = {
-  dog: (payload, update) => {
+  dog: ({ payload, update}) => {
     // 更新dog属性
-    update(payload + 1);
+    update('dog', payload + 1);
   },
-  cat: (payload, update, { witUpdates }) => {
+  cat: ({ payload, update }) => {
     // 横向修改其他属性
-    witUpdates.dog(500);
-    update(payload + 2);
+    update('dog', payload + 2);
+    update('cat', payload + 1);
   },
-  fish: (payload, update, { witValues }) => {
-    // 读取其他属性
-    update(payload + witValues.cat);
+  fish: ({ payload, update, getValue }) => {
+    // 安全读取, 如果对象不存在, 返回 undefined
+    const noHaveThisValue = getValue(v=>v.dog.cat.xxx[0].fjdkafa[123].bb)
+    console.log(noHaveThisValue) // undefined
   },
 };
 ```
@@ -65,9 +66,9 @@ import createwit from 'react-wit';
 
 const isDev = process.env.NODE_ENV === 'development';
 // 依次传入: actions, defaultValues, 打开开发模式的热键(此例子是 ctrl+a)
-const wit = createWit(actions, {}, isDev && 'KeyA');
+const connectWit = createWit(actions, {}, isDev && 'KeyA');
 
-export default wit;
+export default connectWit;
 ```
 
 ## 使用
@@ -75,14 +76,14 @@ export default wit;
 引入刚刚创建的 wit 对象, 给组件注入 action 
 
 ```js
-import wit from '../wit'
+import connectWit from '../connectWit'
 
 //dog 对应 actions.dog
-export default wit('dog', 'cat')({ dog, witActions })=>{
+export default connectWit('dog', 'cat')({ dog, wit })=>{
 
   function updateDog() {
     // 执行 action.dog 函数
-    witActions.dog(50)
+    wit.dispatch('dog', 50)
   }
 
   return (
@@ -100,7 +101,7 @@ export default wit('dog', 'cat')({ dog, witActions })=>{
 
 ```js
 const actions = {
-  dog: (payload, update, { witRollback }) => {
+  dog: ({ payload, update, witRollback }) => {
     // 更新dog属性, 并且记录更新之前的ID
     const timeId = update(payload + 1, true);
 

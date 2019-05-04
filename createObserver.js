@@ -84,6 +84,30 @@ function createObserver(isDev) {
       observer.rollbackIds.push(id);
       return lastId;
     },
+    dispatch: (fn, payload) => {
+      fn({
+        values: observer.values,
+        getValue: getter => {
+          try {
+            return getter(observer.values);
+          } catch (error) {
+            return void 0;
+          }
+        },
+        dispatch: observer.dispatch,
+        rollback: observer.rollback,
+        payload,
+        update: (name, nextValue, isSaveHistory) => {
+          // 更新observer中的值
+          const id = observer.setValues(name, nextValue, isSaveHistory);
+
+          if (observer.triggers[name]) {
+            observer.triggers[name](nextValue);
+          }
+          return id;
+        },
+      });
+    },
     rollback: id => {
       if (!id || !observer.valuesMap[id]) {
         // eslint-disable-next-line
