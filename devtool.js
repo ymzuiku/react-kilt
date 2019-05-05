@@ -85,6 +85,7 @@ class DevTool extends React.PureComponent {
 
     this.state = {
       isShow: false,
+      // eslint-disable-next-line
       reload: 0,
       selectedIndex: 0,
       buttonHover: false,
