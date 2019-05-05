@@ -42,18 +42,18 @@ import createWit from 'components/react-wit';
 
 ```js
 const actions = {
-  dog: ({ payload, update}) => {
+  dog: ({ payload, store}) => {
     // 更新dog属性
-    update('dog', payload + 1);
+    store.set('dog', payload + 1);
   },
-  cat: ({ payload, update }) => {
+  cat: ({ payload, store }) => {
     // 横向修改其他属性
-    update('dog', payload + 2);
-    update('cat', payload + 1);
+    store.set('dog', payload + 2);
+    store.set('cat', payload + 1);
   },
-  fish: ({ payload, update, getValue }) => {
+  fish: ({ payload, store }) => {
     // 安全读取, 如果对象不存在, 返回 undefined
-    const noHaveThisValue = getValue(v=>v.dog.cat.xxx[0].fjdkafa[123].bb)
+    const noHaveThisValue = store.get('dog.cat.xxx.0.fjdkafa.123.bb')
     console.log(noHaveThisValue) // undefined
   },
 };
@@ -101,13 +101,13 @@ export default connectWit('dog', 'cat')({ dog, wit })=>{
 
 ```js
 const actions = {
-  dog: ({ payload, update, witRollback }) => {
+  dog: ({ payload, store, rollback }) => {
     // 更新dog属性, 并且记录更新之前的ID
-    const timeId = update(payload + 1, true);
+    const timeId = store.set('dog', payload + 1, true);
 
     // 根据条件, 可以将**整个项目**回滚到更新之前
     if ('xxx') {
-      witRollback(timeId)
+      rollback(timeId)
     }
   },
 };

@@ -2,6 +2,30 @@ function createObserver(isDev) {
   const observer = {
     values: Object.create(null),
     valuesMap: Object.create(null),
+    store: {
+      get: path => {
+        const list = path.split('.');
+        let data = observer.values;
+
+        for (let i = 0; i < list.length; i++) {
+          data = data[list[i]];
+
+          if (data === void 0) {
+            break;
+          }
+        }
+        return data;
+      },
+      set: (name, nextValue, isSaveHistory) => {
+        // 更新observer中的值
+        const id = observer.setValues(name, nextValue, isSaveHistory);
+
+        if (observer.triggers[name]) {
+          observer.triggers[name](nextValue);
+        }
+        return id;
+      },
+    },
     rollbackIds: [],
     fns: Object.create(null),
     subKeys: Object.create(null),
@@ -87,25 +111,10 @@ function createObserver(isDev) {
     dispatch: (fn, payload) => {
       fn({
         values: observer.values,
-        getValue: getter => {
-          try {
-            return getter(observer.values);
-          } catch (error) {
-            return void 0;
-          }
-        },
+        store: observer.store,
         dispatch: observer.dispatch,
         rollback: observer.rollback,
         payload,
-        update: (name, nextValue, isSaveHistory) => {
-          // 更新observer中的值
-          const id = observer.setValues(name, nextValue, isSaveHistory);
-
-          if (observer.triggers[name]) {
-            observer.triggers[name](nextValue);
-          }
-          return id;
-        },
       });
     },
     rollback: id => {
