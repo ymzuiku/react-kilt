@@ -24,9 +24,6 @@ const createWit = (actions, defalutValues, devKeyCode) => {
   const wit = (...keys) => {
     return Target => {
       class Result extends React.PureComponent {
-        // 用于校验触发事件的是否此组件
-        $$witID = Symbol('witID');
-
         state = Object.create(null);
 
         unmount = false;
@@ -85,7 +82,7 @@ const createWit = (actions, defalutValues, devKeyCode) => {
   };
 
   wit.values = observer.values;
-  wit.update = observer.triggers;
+  wit.store = observer.store;
   wit.rollback = observer.rollback;
   wit.dispatch = dispatch;
 
